@@ -1,0 +1,4 @@
+#@data/values
+---
+component_name: #! the name of the component that you would like to edit; e.g. "kubernetes-sigs_kind"
+component_value: #! the full YAML array that you would like to use to replace the value for the above component

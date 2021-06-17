@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 #
-# Download a BOM and print it to stdout.
-# Requires imgpkg (https://carvel.dev/imgpkg).
+# List available versions of a BOM on stdout.
+# Requires curl and jq.
 #
 
 set -euo pipefail
@@ -24,14 +24,12 @@ function help() {
   echoerr
   echoerr "Flags:"
   echoerr "   -h, --help:           print this usage"
-  echoerr "   -t, --tag <tag_name>: version tag of TKG BOM to fetch (required)"
   echoerr "   -p, --product:        name of product to fetch: can be either 'tkg' or 'tkr' (required)"
   echoerr "   -s, --staging:        use staging registry instead of production"
-  exit 0
+  exit "$1"
 }
 
 help=no
-tag=""
 product=""
 staging=no
 
@@ -39,14 +37,6 @@ while (("$#")); do
   case "$1" in
   -h | --help)
     help=yes
-    shift
-    ;;
-  -t | --tag)
-    shift
-    if [[ "$#" == "0" || "$1" == -* ]]; then
-      usage_error "-t|--tag requires a tag name to be specified"
-    fi
-    tag=$1
     shift
     ;;
   -p | --product)
@@ -62,20 +52,16 @@ while (("$#")); do
     shift
     ;;
   -*)
-    usage_error "Unsupported flag $1" >&2
+    usage_error "Unsupported flag $1"
     ;;
   *)
-    usage_error "Unsupported positional arg $1" >&2
+    usage_error "Unsupported positional arg $1"
     ;;
   esac
 done
 
 if [[ "$help" == "yes" ]]; then
   help 0
-fi
-
-if [[ "$tag" == "" ]]; then
-  usage_error "no tag set. -t|--tag is a required option."
 fi
 
 if [[ "$product" != "tkg" && "$product" != "tkr" ]]; then
@@ -92,22 +78,8 @@ if [[ "$product" == "tkg" ]]; then
   repo="tkg/tkg-bom"
 fi
 
-bomimage="${registry}/${repo}:${tag}"
+bomurl="https://${registry}/v2/${repo}/tags/list"
 
-tmp_dir=$(mktemp -d)
-cleanup() {
-  rm -r "$tmp_dir"
-}
-trap "cleanup" EXIT SIGINT
+echoerr "Listing tags for ${registry}/${repo} ..."
 
-echoerr "Fetching $bomimage ..."
-
-imgpkg pull --image "$bomimage" --output "$tmp_dir" 1>/dev/null
-
-unpacked_yaml_files=("$tmp_dir"/*.yaml)
-if [[ ${#unpacked_yaml_files[@]} -ne 1 ]]; then
-  echoerr "Error: expected exactly one yaml file in extracted image, but found ${#unpacked_yaml_files[@]}."
-  exit 1
-fi
-
-cat "${unpacked_yaml_files[0]}"
+curl -fLsS "$bomurl" | jq -r '.tags[]'

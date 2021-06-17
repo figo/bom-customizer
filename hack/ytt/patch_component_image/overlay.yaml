@@ -1,0 +1,18 @@
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+
+#! Expect there to be one YAML document in the input.
+#@overlay/match by=overlay.all
+---
+components:
+  #@yaml/text-templated-strings
+  (@= data.values.component_name @):
+    #@overlay/match by=overlay.index(data.values.component_version_index)
+    - images:
+        #! Patch the user-specified image_name key's value using a new user-specified value.
+        #! Keys in the user-specified value that match keys in the source will overwrite.
+        #! Keys in the user-specified value that do not exist in the source will be inserted.
+        #! Keys that are not in the user-specified value that exist in the source will leave those keys unchanged.
+        #@yaml/text-templated-strings
+        #@overlay/match-child-defaults missing_ok=True
+        (@= data.values.image_name @): #@ data.values.image_value

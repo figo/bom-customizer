@@ -1,0 +1,6 @@
+#@data/values
+---
+component_name: #! the name of the addon that you would like to edit; e.g. "tanzu_core_addons"
+component_version_index: 0 #! the index of the version within the component's array of version to patch; defaults to 0
+image_name: #! the name of the image within the component to patch; e.g. "kappControllerTemplatesImage"
+image_value: #! the YAML map that you would like to use to patch the values for the above image

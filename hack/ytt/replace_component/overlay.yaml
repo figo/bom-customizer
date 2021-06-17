@@ -1,0 +1,12 @@
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+
+#! Expect there to be one YAML document in the input.
+#@overlay/match by=overlay.all
+---
+components:
+  #! Unconditionally replace the user-specified key with a new user-specified value.
+  #! Leave all other keys/values unchanged.
+  #@overlay/replace
+  #@yaml/text-templated-strings
+  (@= data.values.component_name @): #@ data.values.component_value
