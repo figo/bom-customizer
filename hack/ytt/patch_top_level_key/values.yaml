@@ -1,0 +1,4 @@
+#@data/values
+---
+key_name: #! the name of the top-level key that you would like to edit; e.g. "tkr-bom"
+key_value: #! the YAML value that you would like to use to patch the values for the above key
