@@ -64,7 +64,7 @@ Fully replace a component definition within a BOM file and print the edited BOM.
     images:
       kindNodeImage:
         imagePath: kind/node
-        imageRepository: projects.registry.vmware.com/tce
+        imageRepository: projects.registry.vmware.com/sample
         tag: v1.21.1_vmware.my-custom-version
 ' < /tmp/downloaded-bom.yaml
 ```
