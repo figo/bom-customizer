@@ -24,8 +24,8 @@ function help() {
   echoerr
   echoerr "Flags:"
   echoerr "   -h, --help:           print this usage"
-  echoerr "   -t, --tag <tag_name>: version tag of TKG BOM to fetch (required)"
-  echoerr "   -p, --product:        name of product to fetch: can be either 'tkg' or 'tkr' (required)"
+  echoerr "   -t, --tag <tag_name>: version tag of BOM to fetch (required)"
+  echoerr "   -p, --product:        name of product to fetch: can be 'tkg', 'tkr', or 'tkr-compatibility' (required)"
   echoerr "   -s, --staging:        use staging registry instead of production"
   exit 0
 }
@@ -52,7 +52,7 @@ while (("$#")); do
   -p | --product)
     shift
     if [[ "$#" == "0" || "$1" == -* ]]; then
-      usage_error "-p|--product requires a product name to be specified (either tkg or tkr)"
+      usage_error "-p|--product requires a product name to be specified (tkg, tkr, or tkr-compatibility)"
     fi
     product=$1
     shift
@@ -78,19 +78,25 @@ if [[ "$tag" == "" ]]; then
   usage_error "no tag set. -t|--tag is a required option."
 fi
 
-if [[ "$product" != "tkg" && "$product" != "tkr" ]]; then
-  usage_error "-p|--product is required and must be either 'tkg' or 'tkr'"
-fi
-
 registry="projects.registry.vmware.com"
 if [[ "$staging" == "yes" ]]; then
   registry="projects-stg.registry.vmware.com"
 fi
 
-repo="tkg/tkr-bom"
-if [[ "$product" == "tkg" ]]; then
+case "$product" in
+"tkg")
   repo="tkg/tkg-bom"
-fi
+  ;;
+"tkr")
+  repo="tkg/tkr-bom"
+  ;;
+"tkr-compatibility")
+  repo="tkg/tkr-compatibility"
+  ;;
+*)
+  usage_error "-p|--product is required and must be either 'tkg', 'tkr', or 'tkr-compatibility'"
+  ;;
+esac
 
 bomimage="${registry}/${repo}:${tag}"
 
