@@ -1,4 +1,4 @@
-# tkr-customizer
+# bom-customizer
 
 Utilities to help find, download, and customize TKR and TKG BOM files.
 
